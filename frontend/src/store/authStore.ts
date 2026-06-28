@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface AuthState {
   access: string | null;
@@ -10,26 +11,32 @@ interface AuthState {
   logout: () => void;
 }
 
-export const useAuthStore =
-  create<AuthState>((set) => ({
-    access: null,
-    refresh: null,
-    role: null,
-    email: null,
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      access: null,
+      refresh: null,
+      role: null,
+      email: null,
 
-    setAuth: (data) =>
-      set({
-        access: data.access,
-        refresh: data.refresh,
-        role: data.role,
-        email: data.email,
-      }),
+      setAuth: (data) =>
+        set({
+          access: data.access,
+          refresh: data.refresh,
+          role: data.role,
+          email: data.email,
+        }),
 
-    logout: () =>
-      set({
-        access: null,
-        refresh: null,
-        role: null,
-        email: null,
-      }),
-  }));
+      logout: () =>
+        set({
+          access: null,
+          refresh: null,
+          role: null,
+          email: null,
+        }),
+    }),
+    {
+      name: "kwari-mart-auth",
+    }
+  )
+);

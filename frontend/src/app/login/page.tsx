@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { loginUser } from "@/services/authService";
 import { useAuthStore } from "@/store/authStore";
 
+
 export default function LoginPage() {
   const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
@@ -24,11 +25,6 @@ export default function LoginPage() {
       });
 
       setAuth(data);
-
-      localStorage.setItem(
-        "auth",
-        JSON.stringify(data)
-      );
 
       if (data.role === "merchant") {
         router.push("/merchant/dashboard");
