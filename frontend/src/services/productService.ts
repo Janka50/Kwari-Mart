@@ -67,3 +67,24 @@ export const updateProduct = async (
 
   return response.data;
 };
+
+export const getProduct = async (
+  id: number
+) => {
+  const response = await api.get(
+    `/products/${id}/`
+  );
+
+  return response.data;
+};
+
+export const getStoreProducts = async (
+  storeId: number
+) => {
+  const response = await api.get(
+    `/products/store/${storeId}/`
+  );
+
+  return response.data;
+};
+

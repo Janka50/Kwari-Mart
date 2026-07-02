@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { useAuthStore } from "@/store/authStore";
-import { getMyStore } from "@/store/storeService";
+import { getMyStore } from "@/services/storeService";
 
 export default function MyStorePage() {
   const token = useAuthStore((state) => state.access);

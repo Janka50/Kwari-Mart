@@ -1,35 +1,55 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 
 import { useAuthStore } from "@/store/authStore";
-import { createProduct } from "@/services/productService";
 
-export default function CreateProductPage() {
+import {
+  getProduct,
+  updateProduct,
+} from "@/services/productService";
+
+export default function EditProductPage() {
   const router = useRouter();
+  const params = useParams();
 
   const token = useAuthStore(
     (state) => state.access
   );
 
-  const [name, setName] =
-    useState("");
+  const id = Number(params.id);
 
+  const [name, setName] = useState("");
   const [description, setDescription] =
     useState("");
-
-  const [price, setPrice] =
-    useState("");
-
-  const [stockQuantity, setStockQuantity] =
-    useState("");
-
+  const [price, setPrice] = useState("");
+  const [stock, setStock] = useState("");
   const [isActive, setIsActive] =
     useState(true);
 
   const [image, setImage] =
     useState<File | null>(null);
+
+  useEffect(() => {
+    loadProduct();
+  }, []);
+
+  const loadProduct = async () => {
+    try {
+      const product = await getProduct(id);
+
+      setName(product.name);
+      setDescription(product.description);
+      setPrice(product.price);
+      setStock(
+        product.stock_quantity.toString()
+      );
+      setIsActive(product.is_active);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleSubmit = async (
     e: React.FormEvent
@@ -37,7 +57,7 @@ export default function CreateProductPage() {
     e.preventDefault();
 
     if (!token) {
-      alert("Login required");
+      alert("Please login again.");
       return;
     }
 
@@ -45,123 +65,89 @@ export default function CreateProductPage() {
       const formData = new FormData();
 
       formData.append("name", name);
-
       formData.append(
         "description",
         description
       );
-
-      formData.append(
-        "price",
-        price
-      );
-
+      formData.append("price", price);
       formData.append(
         "stock_quantity",
-        stockQuantity
+        stock
       );
-
       formData.append(
         "is_active",
         String(isActive)
       );
 
       if (image) {
-        formData.append(
-          "image",
-          image
-        );
+        formData.append("image", image);
       }
 
-      await createProduct(
+      await updateProduct(
+        id,
         formData,
         token
       );
 
-      alert(
-        "Product created successfully"
-      );
+      alert("Product updated!");
 
       router.push(
-        "/merchant/products"
+        "/merchant/products/my"
       );
-
     } catch (error) {
       console.error(error);
-      alert(
-        "Failed to create product"
-      );
+      alert("Update failed.");
     }
   };
 
   return (
     <div className="max-w-xl mx-auto p-8">
-
       <h1 className="text-3xl font-bold mb-6">
-        Create Product
+        Edit Product
       </h1>
 
       <form
         onSubmit={handleSubmit}
         className="space-y-4"
       >
-
         <input
-          type="text"
-          placeholder="Product Name"
+          className="w-full border p-3 rounded"
           value={name}
           onChange={(e) =>
             setName(e.target.value)
           }
-          className="border p-2 w-full"
         />
 
         <textarea
-          placeholder="Description"
+          className="w-full border p-3 rounded"
+          rows={4}
           value={description}
           onChange={(e) =>
             setDescription(
               e.target.value
             )
           }
-          className="border p-2 w-full"
         />
 
         <input
           type="number"
-          placeholder="Price"
+          className="w-full border p-3 rounded"
           value={price}
           onChange={(e) =>
-            setPrice(
-              e.target.value
-            )
+            setPrice(e.target.value)
           }
-          className="border p-2 w-full"
         />
 
         <input
           type="number"
-          placeholder="Stock Quantity"
-          value={stockQuantity}
+          className="w-full border p-3 rounded"
+          value={stock}
           onChange={(e) =>
-            setStockQuantity(
-              e.target.value
-            )
-          }
-          className="border p-2 w-full"
-        />
-
-        <input
-          type="file"
-          onChange={(e) =>
-            setImage(
-              e.target.files?.[0] || null
-            )
+            setStock(e.target.value)
           }
         />
 
-        <label className="flex gap-2">
-
+        <label className="flex items-center gap-2">
           <input
             type="checkbox"
             checked={isActive}
@@ -171,20 +157,28 @@ export default function CreateProductPage() {
               )
             }
           />
-
-          Active Product
-
+          Active
         </label>
+
+        <input
+          type="file"
+          accept="image/*"
+          onChange={(e) =>
+            setImage(
+              e.target.files
+                ? e.target.files[0]
+                : null
+            )
+          }
+        />
 
         <button
           type="submit"
-          className="bg-black text-white px-4 py-2"
+          className="bg-blue-600 text-white px-6 py-3 rounded"
         >
-          Create Product
+          Update Product
         </button>
-
       </form>
-
     </div>
   );
 }
