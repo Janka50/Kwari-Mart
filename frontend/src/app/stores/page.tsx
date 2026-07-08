@@ -1,9 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { FaStore } from "react-icons/fa";
 
 import { getStores } from "@/services/storeService";
+
+import StoreCard from "@/components/store/StoreCard";
+
+import Section from "@/components/ui/Section";
+import PageHeader from "@/components/ui/PageHeader";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
+import EmptyState from "@/components/ui/EmptyState";
 
 interface Store {
   id: number;
@@ -14,75 +21,64 @@ interface Store {
 }
 
 export default function StoresPage() {
-  const [stores, setStores] =
-    useState<Store[]>([]);
+
+  const [stores, setStores] = useState<Store[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadStores();
   }, []);
 
-  const loadStores = async () => {
+  async function loadStores() {
     try {
       const data = await getStores();
-      setStores(data.results);
+
+      setStores(
+        data.results ?? data
+      );
+
     } catch (error) {
       console.error(error);
+    } finally {
+      setLoading(false);
     }
-  };
+  }
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
+  if (stores.length === 0) {
+    return (
+      <Section>
+        <EmptyState
+          icon={<FaStore size={70} />}
+          title="No Stores Yet"
+          description="Merchants will appear here after creating stores."
+        />
+      </Section>
+    );
+  }
 
   return (
-    <div className="max-w-7xl mx-auto p-8">
+    <Section>
 
-      <h1 className="text-4xl font-bold mb-8">
-        Marketplace
-      </h1>
+      <PageHeader
+        title="Browse Stores"
+        subtitle="Discover trusted merchants across KwariMart."
+      />
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
 
         {stores.map((store) => (
-
-          <div
+          <StoreCard
             key={store.id}
-            className="border rounded-lg shadow p-5"
-          >
-
-            {store.logo && (
-
-              <img
-                src={store.logo}
-                alt={store.name}
-                className="w-full h-48 object-cover rounded"
-              />
-
-            )}
-
-            <h2 className="text-2xl font-semibold mt-4">
-              {store.name}
-            </h2>
-
-            <p className="mt-2">
-              {store.description}
-            </p>
-
-            <p className="mt-3 text-gray-600">
-              Products:
-              {" "}
-              {store.product_count}
-            </p>
-
-            <Link
-              href={`/stores/${store.id}`}
-              className="inline-block mt-5 bg-blue-600 text-white px-5 py-2 rounded"
-            >
-              View Store
-            </Link>
-
-          </div>
-
+            store={store}
+          />
         ))}
 
       </div>
 
-    </div>
+    </Section>
   );
 }

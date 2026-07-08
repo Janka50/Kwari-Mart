@@ -1,3 +1,4 @@
+```tsx
 "use client";
 
 import { useState } from "react";
@@ -51,10 +52,8 @@ export default function CheckoutPage() {
       alert("Order placed successfully!");
 
       router.push("/customer/orders");
-
     } catch (error) {
       console.error(error);
-
       alert("Failed to place your order.");
     } finally {
       setLoading(false);
@@ -62,75 +61,118 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-7xl mx-auto px-6 py-10">
 
-      <h1 className="text-4xl font-bold mb-8">
+      <h1 className="text-4xl font-bold mb-10">
         Checkout
       </h1>
 
-      <div className="space-y-4">
+      <div className="grid lg:grid-cols-3 gap-10">
 
-        {items.map((item) => (
+        <div className="lg:col-span-2">
 
-          <div
-            key={item.id}
-            className="border rounded-lg p-5 flex justify-between items-center"
-          >
+          <div className="bg-white rounded-2xl shadow border p-8">
 
-            <div>
+            <h2 className="text-2xl font-bold mb-8">
+              Order Items
+            </h2>
 
-              <h2 className="font-semibold text-lg">
-                {item.name}
-              </h2>
+            <div className="space-y-6">
 
-              <p>
-                Quantity: {item.quantity}
-              </p>
+              {items.map((item) => (
 
-            </div>
+                <div
+                  key={item.id}
+                  className="flex justify-between items-center border-b pb-5"
+                >
 
-            <div className="font-bold text-green-600">
+                  <div>
 
-              ₦
-              {(
-                item.price *
-                item.quantity
-              ).toLocaleString()}
+                    <h3 className="font-semibold text-lg">
+                      {item.name}
+                    </h3>
+
+                    <p className="text-gray-500">
+                      Quantity: {item.quantity}
+                    </p>
+
+                  </div>
+
+                  <div className="text-right">
+
+                    <p className="font-bold text-xl text-green-600">
+                      ₦
+                      {(
+                        item.price *
+                        item.quantity
+                      ).toLocaleString()}
+                    </p>
+
+                  </div>
+
+                </div>
+
+              ))}
 
             </div>
 
           </div>
 
-        ))}
+        </div>
 
-      </div>
+        <div>
 
-      <div className="mt-10 border-t pt-8">
+          <div className="bg-white rounded-2xl shadow border p-8 sticky top-24">
 
-        <h2 className="text-3xl font-bold">
+            <h2 className="text-2xl font-bold mb-8">
+              Order Summary
+            </h2>
 
-          Total:
+            <div className="space-y-4">
 
-          <span className="text-green-600 ml-3">
+              <div className="flex justify-between">
+                <span>Items</span>
+                <span>{items.length}</span>
+              </div>
 
-            ₦{total.toLocaleString()}
+              <div className="flex justify-between">
+                <span>Shipping</span>
+                <span className="text-green-600">
+                  Free
+                </span>
+              </div>
 
-          </span>
+              <hr />
 
-        </h2>
+              <div className="flex justify-between text-2xl font-bold">
 
-        <button
-          onClick={handleCheckout}
-          disabled={loading}
-          className="mt-8 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white px-8 py-3 rounded"
-        >
-          {loading
-            ? "Placing Order..."
-            : "Place Order"}
-        </button>
+                <span>Total</span>
+
+                <span className="text-green-600">
+                  ₦{total.toLocaleString()}
+                </span>
+
+              </div>
+
+            </div>
+
+            <button
+              onClick={handleCheckout}
+              disabled={loading}
+              className="w-full mt-8 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white py-4 rounded-xl font-semibold transition"
+            >
+              {loading
+                ? "Placing Order..."
+                : "Place Order"}
+            </button>
+
+          </div>
+
+        </div>
 
       </div>
 
     </div>
   );
 }
+```

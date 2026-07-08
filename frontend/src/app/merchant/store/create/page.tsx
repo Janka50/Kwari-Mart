@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
-import { createStore } from "@/store/storeService";
+import { createStore } from "@/services/storeService";
 
 export default function CreateStorePage() {
   const router = useRouter();

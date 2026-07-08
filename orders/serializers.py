@@ -14,7 +14,8 @@ class OrderSerializer(
     store_name = serializers.ReadOnlyField(
         source="product.store.name"
     )
-
+    customer_email = serializers.ReadOnlyField(
+        source="customer.email"
     class Meta:
         model = Order
 
@@ -33,6 +34,7 @@ class OrderSerializer(
 
         read_only_fields = (
             "customer",
+            "customer_email",
             "product_name",
             "store_name",
             "unit_price",

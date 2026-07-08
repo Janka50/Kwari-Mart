@@ -5,7 +5,18 @@ import { useParams } from "next/navigation";
 
 import { getProduct } from "@/services/productService";
 import { useCartStore } from "@/store/cartStore";
-import type { Product } from "@/types/product";
+
+interface Product {
+  id: number;
+  store: number;
+  store_name: string;
+  name: string;
+  description: string;
+  price: string;
+  image: string | null;
+  stock_quantity: number;
+  is_active: boolean;
+}
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -13,41 +24,30 @@ export default function ProductDetailPage() {
   const id = Number(params.id);
 
   const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  const addItem = useCartStore((state) => state.addItem);
+  const addItem = useCartStore(
+    (state) => state.addItem
+  );
 
   useEffect(() => {
-    if (!id) return;
-
-    loadProduct();
+    if (id) {
+      loadProduct();
+    }
   }, [id]);
 
-  async function loadProduct() {
+  const loadProduct = async () => {
     try {
       const data = await getProduct(id);
       setProduct(data);
     } catch (error) {
       console.error(error);
-    } finally {
-      setLoading(false);
     }
-  }
-
-  if (loading) {
-    return (
-      <div className="max-w-6xl mx-auto p-8">
-        Loading product...
-      </div>
-    );
-  }
+  };
 
   if (!product) {
     return (
-      <div className="max-w-6xl mx-auto p-8">
-        <h1 className="text-2xl font-bold">
-          Product not found
-        </h1>
+      <div className="p-8">
+        Loading...
       </div>
     );
   }
@@ -57,16 +57,12 @@ export default function ProductDetailPage() {
       <div className="grid md:grid-cols-2 gap-10">
 
         <div>
-          {product.image ? (
+          {product.image && (
             <img
               src={product.image}
               alt={product.name}
               className="w-full rounded-lg border"
             />
-          ) : (
-            <div className="h-96 border rounded-lg flex items-center justify-center">
-              No Image
-            </div>
           )}
         </div>
 
@@ -76,14 +72,12 @@ export default function ProductDetailPage() {
             {product.name}
           </h1>
 
-          {"store_name" in product && (
-            <p className="text-gray-500 mt-2">
-              Sold by {product.store_name}
-            </p>
-          )}
+          <p className="text-gray-500 mt-2">
+            Sold by {product.store_name}
+          </p>
 
           <p className="text-3xl font-bold text-green-600 mt-6">
-            ₦{Number(product.price).toLocaleString()}
+            ₦{product.price}
           </p>
 
           <p className="mt-6">
@@ -91,12 +85,12 @@ export default function ProductDetailPage() {
           </p>
 
           <p className="mt-6">
-            <strong>Stock:</strong>{" "}
+            <strong>Stock Available:</strong>{" "}
             {product.stock_quantity}
           </p>
 
           <button
-            disabled={product.stock_quantity === 0}
+            className="mt-8 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg"
             onClick={() => {
               addItem({
                 id: product.id,
@@ -104,19 +98,13 @@ export default function ProductDetailPage() {
                 price: Number(product.price),
                 image: product.image,
                 quantity: 1,
-
-                // Remove this line if your CartItem
-                // interface doesn't contain stock_quantity.
                 stock_quantity: product.stock_quantity,
               });
 
-              alert("Product added to cart!");
+              alert("Added to cart!");
             }}
-            className="mt-8 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-8 py-3 rounded-lg"
           >
-            {product.stock_quantity > 0
-              ? "Add to Cart"
-              : "Out of Stock"}
+            Add to Cart
           </button>
 
         </div>

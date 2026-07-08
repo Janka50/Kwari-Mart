@@ -88,3 +88,7 @@ export const getStoreProducts = async (
   return response.data;
 };
 
+export const getProducts = async () => {
+  const response = await api.get("/products/");
+  return response.data;
+};
